@@ -1,0 +1,22 @@
+@import "tailwindcss";
+
+/**
+ * Template/JS/Python paths Tailwind scans for class names when generating
+ * the compiled CSS file.
+ */
+@source "../../../**/*.{html,py,js}";
+
+/**
+ * CASTER brand tokens — navy (primary) + amber/gold (accent).
+ * Referenced in templates as bg-brand-navy, text-brand-gold, etc.
+ */
+@theme {
+  --color-brand-navy: #0a1f44;
+  --color-brand-navy-light: #14315e;
+  --color-brand-navy-dark: #061530;
+  --color-brand-gold: #d4a437;
+  --color-brand-gold-light: #e6c368;
+  --color-brand-cream: #f7f5f0;
+
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+}
