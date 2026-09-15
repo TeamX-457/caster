@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard — CASTER{% endblock %}
+
+{% block content %}
+<section class="mx-auto max-w-5xl px-6 py-16">
+    <div class="flex items-center justify-between">
+        <div>
+            <h1 class="text-2xl font-bold text-brand-navy">Welcome back, {{ request.user.first_name|default:request.user.username }}</h1>
+            <p class="mt-1 text-sm text-slate-600">{{ request.user.school.name }}</p>
+        </div>
+        <a href="{% url 'study:studyguide_create' %}" class="rounded-md bg-brand-navy px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-brand-navy-light">
+            + New study guide
+        </a>
+    </div>
+
+    <h2 class="mt-10 text-lg font-semibold text-brand-navy">Your study guides</h2>
+    {% if study_guides %}
+        <div class="mt-4 overflow-x-auto rounded-lg border border-slate-100">
+            <table class="min-w-full divide-y divide-slate-100 text-sm">
+                <thead class="bg-slate-50">
+                    <tr>
+                        <th class="px-4 py-3 text-left font-semibold text-slate-600">Subject</th>
+                        <th class="px-4 py-3 text-left font-semibold text-slate-600">Title</th>
+                        <th class="px-4 py-3 text-left font-semibold text-slate-600">Assigned to</th>
+                        <th class="px-4 py-3"></th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                    {% for guide in study_guides %}
+                        <tr>
+                            <td class="px-4 py-3 text-slate-700">{{ guide.subject }}</td>
+                            <td class="px-4 py-3 text-slate-700">{{ guide.title }}</td>
+                            <td class="px-4 py-3 text-slate-500">{{ guide.progress_records.count }} student(s)</td>
+                            <td class="px-4 py-3 text-right">
+                                <a href="{% url 'study:studyguide_detail' guide.pk %}" class="font-semibold text-brand-navy hover:underline">Manage &rarr;</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p class="mt-4 text-sm text-slate-500">You haven't created any study guides yet.</p>
+    {% endif %}
+
+    <h2 class="mt-10 text-lg font-semibold text-brand-navy">Students at your school</h2>
+    {% if students %}
+        <div class="mt-4 overflow-x-auto rounded-lg border border-slate-100">
+            <table class="min-w-full divide-y divide-slate-100 text-sm">
+                <thead class="bg-slate-50">
+                    <tr>
+                        <th class="px-4 py-3 text-left font-semibold text-slate-600">Name</th>
+                        <th class="px-4 py-3 text-left font-semibold text-slate-600">Email</th>
+                        <th class="px-4 py-3 text-left font-semibold text-slate-600">Grade</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                    {% for student in students %}
+                        <tr>
+                            <td class="px-4 py-3 text-slate-700">{{ student.user.get_full_name|default:student.user.username }}</td>
+                            <td class="px-4 py-3 text-slate-500">{{ student.user.email }}</td>
+                            <td class="px-4 py-3 text-slate-500">{{ student.grade_level|default:"—" }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p class="mt-4 text-sm text-slate-500">No students have joined your school yet.</p>
+    {% endif %}
+</section>
+{% endblock %}

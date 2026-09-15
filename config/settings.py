@@ -36,6 +36,9 @@ INSTALLED_APPS = [
     'django_browser_reload',
 
     # Local apps
+    'apps.accounts',
+    'apps.study',
+    'apps.assessments',
     'apps.marketing',
 ]
 
@@ -84,8 +87,7 @@ DATABASES = {
 }
 
 
-# Custom user model is introduced in Phase 2 (apps.accounts.User).
-# AUTH_USER_MODEL = 'accounts.User'
+AUTH_USER_MODEL = 'accounts.User'
 
 
 # Password validation
@@ -129,5 +131,6 @@ EMAIL_BACKEND = env(
     default='django.core.mail.backends.console.EmailBackend',
 )
 
-LOGIN_REDIRECT_URL = 'marketing:home'
+LOGIN_URL = 'accounts:login'
+LOGIN_REDIRECT_URL = 'accounts:dashboard'
 LOGOUT_REDIRECT_URL = 'marketing:home'

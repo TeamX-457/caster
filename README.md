@@ -27,17 +27,46 @@ npm packages, `django-tailwind` also supports the full Node-based template.
 caster/
 ├── config/                 # Django project settings, root urls
 ├── apps/
-│   └── marketing/          # Phase 1: public landing site + waitlist
+│   ├── marketing/          # Phase 1: public landing site + waitlist
+│   ├── accounts/           # Phase 2: custom User (student/teacher/school_admin), School
+│   ├── study/              # Phase 2: StudyGuide, LearningActivity, StudentProgress
+│   └── assessments/        # Phase 2: Assessment, Question, Choice, AssessmentAttempt
 ├── theme/                  # django-tailwind app (Tailwind source + compiled CSS)
-├── templates/              # Project-level templates (base.html, includes/, marketing/)
+├── templates/              # Project-level templates (base.html, includes/, per-app dirs)
 ├── static/                 # Project-level static assets (images, etc.)
 ├── requirements.txt
 ├── .env.example
 └── manage.py
 ```
 
-Phase 2 will add `apps/accounts`, `apps/study`, and `apps/assessments` for the learning
-platform (custom user model, study guides, quizzes, progress tracking).
+## The learning platform (Phase 2)
+
+- **Custom user model** (`apps.accounts.User`, `AUTH_USER_MODEL`) with a `role` field
+  (`student` / `teacher` / `school_admin`) and a `school` FK. `Teacher` and `Student` are
+  one-to-one profile models holding role-specific fields.
+- **Roles and how accounts are created:**
+  - *School admin* — registers at `/accounts/signup/school/`, which creates both the
+    `School` and the admin's `User` in one step.
+  - *Teacher* — added by a school admin from their dashboard (`/accounts/teachers/add/`);
+    there's no public teacher self-registration, since a school should control who can
+    create content and see its students' data.
+  - *Student* — registers at `/accounts/signup/student/`, selecting their school from a
+    list of already-registered schools.
+- **Dashboards** (`/accounts/dashboard/`) branch by role: students see assigned study
+  guides with progress status and their assessment history; teachers see their study
+  guides and their school's students; school admins see aggregate counts, their teacher
+  roster, and their student roster.
+- **Study guides**: a teacher creates a `StudyGuide` (subject/topic/title/content), can add
+  `LearningActivity` entries to it, and assigns it to specific students — which creates a
+  `StudentProgress` row per student. Opening the guide as a student advances its status
+  `assigned → in_progress`; a "Mark as completed" button advances it to `completed`.
+- **Assessments**: a teacher attaches an `Assessment` to a study guide and adds
+  multiple-choice `Question`/`Choice` pairs one at a time. Students take the assessment;
+  submitting grades it server-side and stores an `AssessmentAttempt` (score/total) plus a
+  `StudentAnswer` per question, both shown in the student's assessment history.
+- **No seed data**: the app ships with no fixtures and no demo accounts. Every school,
+  teacher, student, study guide, and assessment is created through the real registration
+  and content-management flows described above.
 
 ## Setup
 
@@ -118,7 +147,22 @@ Visit `http://127.0.0.1:8000/`.
 ## Admin
 
 Visit `/admin/` and log in with the superuser you created to view waitlist signups
-(**Marketing → Waitlist signups**).
+(**Marketing → Waitlist signups**) and all Phase 2 data (schools, users, study guides,
+assessments, progress, and attempts).
+
+## Trying out the learning platform
+
+There's no seed data, so exercise the real flows:
+
+1. Go to `/accounts/signup/school/` and register a school — you become its admin.
+2. From your dashboard, use **+ Add teacher** to create a teacher account.
+3. Log out, log in as the teacher, and create a study guide (**+ New study guide**).
+4. Add an activity and an assessment (with questions/choices) to it.
+5. Go to `/accounts/signup/student/` in a different browser/session and register a
+   student, selecting the school from step 1.
+6. Back as the teacher, open the study guide and **Assign to students**.
+7. Log in as the student to see the assigned guide, mark it complete, and take the
+   assessment — the score and history show up immediately on the student dashboard.
 
 ## Environment variables
 

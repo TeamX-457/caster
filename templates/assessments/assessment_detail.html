@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block title %}{{ assessment.title }} — CASTER{% endblock %}
+
+{% block content %}
+<section class="mx-auto max-w-2xl px-6 py-16">
+    <p class="text-sm font-semibold uppercase tracking-wide text-brand-gold">{{ assessment.study_guide.title }}</p>
+    <h1 class="mt-1 text-2xl font-bold text-brand-navy">{{ assessment.title }}</h1>
+    <p class="mt-1 text-sm text-slate-500">{{ assessment.questions.count }} question(s)</p>
+
+    {% if request.user.is_student %}
+        {% if attempt %}
+            <div class="mt-6 rounded-lg border border-slate-100 p-4">
+                <p class="text-sm text-slate-600">Your last score: <span class="font-semibold text-brand-navy">{{ attempt.score }}/{{ attempt.total }} ({{ attempt.percent }}%)</span></p>
+                <a href="{% url 'assessments:attempt_result' attempt.pk %}" class="text-sm font-semibold text-brand-navy hover:underline">Review your answers &rarr;</a>
+            </div>
+        {% endif %}
+        {% if assessment.questions.count %}
+            <a href="{% url 'assessments:assessment_take' assessment.pk %}" class="mt-6 inline-block rounded-md bg-brand-navy px-6 py-3 text-sm font-semibold text-white shadow-sm hover:bg-brand-navy-light">
+                {% if attempt %}Retake assessment{% else %}Start assessment{% endif %}
+            </a>
+        {% else %}
+            <p class="mt-6 text-sm text-slate-500">This assessment has no questions yet.</p>
+        {% endif %}
+    {% else %}
+        <h2 class="mt-8 text-lg font-semibold text-brand-navy">Questions</h2>
+        {% if assessment.questions.all %}
+            <ul class="mt-4 space-y-3">
+                {% for question in assessment.questions.all %}
+                    <li class="rounded-lg border border-slate-100 p-4">
+                        <p class="font-medium text-slate-800">{{ forloop.counter }}. {{ question.text }}</p>
+                        <ul class="mt-2 space-y-1 text-sm text-slate-600">
+                            {% for choice in question.choices.all %}
+                                <li class="{% if choice.is_correct %}font-semibold text-green-700{% endif %}">
+                                    {{ choice.text }}{% if choice.is_correct %} (correct){% endif %}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="mt-4 text-sm text-slate-500">No questions yet.</p>
+        {% endif %}
+        <a href="{% url 'assessments:question_create' assessment.pk %}" class="mt-6 inline-block rounded-md border border-brand-navy px-4 py-2 text-sm font-semibold text-brand-navy hover:bg-brand-navy hover:text-white">
+            + Add question
+        </a>
+    {% endif %}
+</section>
+{% endblock %}

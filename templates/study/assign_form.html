@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block title %}Assign study guide — CASTER{% endblock %}
+
+{% block content %}
+<section class="mx-auto max-w-xl px-6 py-16">
+    <p class="text-sm font-semibold uppercase tracking-wide text-brand-gold">{{ study_guide.title }}</p>
+    <h1 class="mt-1 text-2xl font-bold text-brand-navy">Assign to students</h1>
+
+    {% if form.fields.students.queryset %}
+        <form method="post" class="mt-6">
+            {% csrf_token %}
+            <div class="space-y-2">
+                {% for checkbox in form.students %}
+                    <label class="flex items-center gap-2 rounded-md border border-slate-100 p-3 text-sm text-slate-700">
+                        {{ checkbox.tag }} {{ checkbox.choice_label }}
+                    </label>
+                {% endfor %}
+            </div>
+            {% for error in form.students.errors %}<p class="mt-2 text-sm text-red-600">{{ error }}</p>{% endfor %}
+            <button type="submit" class="mt-6 rounded-md bg-brand-navy px-6 py-3 text-sm font-semibold text-white shadow-sm hover:bg-brand-navy-light">
+                Assign
+            </button>
+        </form>
+    {% else %}
+        <p class="mt-6 text-sm text-slate-500">No students have joined your school yet.</p>
+    {% endif %}
+</section>
+{% endblock %}

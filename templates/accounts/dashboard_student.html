@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard — CASTER{% endblock %}
+
+{% block content %}
+<section class="mx-auto max-w-5xl px-6 py-16">
+    <h1 class="text-2xl font-bold text-brand-navy">Welcome back, {{ request.user.first_name|default:request.user.username }}</h1>
+    <p class="mt-1 text-sm text-slate-600">{{ request.user.school.name }}</p>
+
+    <h2 class="mt-10 text-lg font-semibold text-brand-navy">Your study guides</h2>
+    {% if progress_records %}
+        <div class="mt-4 overflow-x-auto rounded-lg border border-slate-100">
+            <table class="min-w-full divide-y divide-slate-100 text-sm">
+                <thead class="bg-slate-50">
+                    <tr>
+                        <th class="px-4 py-3 text-left font-semibold text-slate-600">Subject</th>
+                        <th class="px-4 py-3 text-left font-semibold text-slate-600">Title</th>
+                        <th class="px-4 py-3 text-left font-semibold text-slate-600">Status</th>
+                        <th class="px-4 py-3"></th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                    {% for progress in progress_records %}
+                        <tr>
+                            <td class="px-4 py-3 text-slate-700">{{ progress.study_guide.subject }}</td>
+                            <td class="px-4 py-3 text-slate-700">{{ progress.study_guide.title }}</td>
+                            <td class="px-4 py-3">
+                                <span class="inline-flex rounded-full px-2 py-1 text-xs font-medium
+                                    {% if progress.status == 'completed' %}bg-green-100 text-green-800
+                                    {% elif progress.status == 'in_progress' %}bg-amber-100 text-amber-800
+                                    {% else %}bg-slate-100 text-slate-700{% endif %}">
+                                    {{ progress.get_status_display }}
+                                </span>
+                            </td>
+                            <td class="px-4 py-3 text-right">
+                                <a href="{% url 'study:studyguide_detail' progress.study_guide.pk %}" class="font-semibold text-brand-navy hover:underline">Open &rarr;</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p class="mt-4 text-sm text-slate-500">No study guides assigned yet. Check back once your teacher assigns one.</p>
+    {% endif %}
+
+    <h2 class="mt-10 text-lg font-semibold text-brand-navy">Quiz &amp; assessment history</h2>
+    {% if attempts %}
+        <div class="mt-4 overflow-x-auto rounded-lg border border-slate-100">
+            <table class="min-w-full divide-y divide-slate-100 text-sm">
+                <thead class="bg-slate-50">
+                    <tr>
+                        <th class="px-4 py-3 text-left font-semibold text-slate-600">Assessment</th>
+                        <th class="px-4 py-3 text-left font-semibold text-slate-600">Score</th>
+                        <th class="px-4 py-3 text-left font-semibold text-slate-600">Date</th>
+                        <th class="px-4 py-3"></th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                    {% for attempt in attempts %}
+                        <tr>
+                            <td class="px-4 py-3 text-slate-700">{{ attempt.assessment.title }}</td>
+                            <td class="px-4 py-3 text-slate-700">{{ attempt.score }}/{{ attempt.total }} ({{ attempt.percent }}%)</td>
+                            <td class="px-4 py-3 text-slate-500">{{ attempt.completed_at|date:"M j, Y" }}</td>
+                            <td class="px-4 py-3 text-right">
+                                <a href="{% url 'assessments:attempt_result' attempt.pk %}" class="font-semibold text-brand-navy hover:underline">Review &rarr;</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p class="mt-4 text-sm text-slate-500">You haven't taken any assessments yet.</p>
+    {% endif %}
+</section>
+{% endblock %}

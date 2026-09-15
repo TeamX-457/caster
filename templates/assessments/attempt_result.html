@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block title %}Results — {{ attempt.assessment.title }} — CASTER{% endblock %}
+
+{% block content %}
+<section class="mx-auto max-w-2xl px-6 py-16">
+    <p class="text-sm font-semibold uppercase tracking-wide text-brand-gold">{{ attempt.assessment.title }}</p>
+    <h1 class="mt-1 text-2xl font-bold text-brand-navy">You scored {{ attempt.score }}/{{ attempt.total }} ({{ attempt.percent }}%)</h1>
+    <p class="mt-1 text-sm text-slate-500">Completed {{ attempt.completed_at|date:"M j, Y, g:i a" }}</p>
+
+    <ul class="mt-8 space-y-4">
+        {% for answer in attempt.answers.all %}
+            <li class="rounded-lg border border-slate-100 p-4">
+                <p class="font-medium text-slate-800">{{ forloop.counter }}. {{ answer.question.text }}</p>
+                <p class="mt-2 text-sm">
+                    Your answer:
+                    <span class="{% if answer.selected_choice.is_correct %}font-semibold text-green-700{% else %}font-semibold text-red-700{% endif %}">
+                        {{ answer.selected_choice.text|default:"No answer" }}
+                    </span>
+                </p>
+                {% if not answer.selected_choice.is_correct %}
+                    <p class="mt-1 text-sm text-slate-600">
+                        Correct answer:
+                        <span class="font-semibold text-green-700">
+                            {% for choice in answer.question.choices.all %}{% if choice.is_correct %}{{ choice.text }}{% endif %}{% endfor %}
+                        </span>
+                    </p>
+                {% endif %}
+            </li>
+        {% endfor %}
+    </ul>
+
+    <p class="mt-8 text-sm">
+        <a href="{% url 'accounts:dashboard' %}" class="font-semibold text-brand-navy hover:underline">&larr; Back to dashboard</a>
+    </p>
+</section>
+{% endblock %}

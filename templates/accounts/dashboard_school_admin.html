@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard — CASTER{% endblock %}
+
+{% block content %}
+<section class="mx-auto max-w-5xl px-6 py-16">
+    <div class="flex items-center justify-between">
+        <div>
+            <h1 class="text-2xl font-bold text-brand-navy">{{ school.name }}</h1>
+            <p class="mt-1 text-sm text-slate-600">School administrator dashboard</p>
+        </div>
+        <a href="{% url 'accounts:add_teacher' %}" class="rounded-md bg-brand-navy px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-brand-navy-light">
+            + Add teacher
+        </a>
+    </div>
+
+    <div class="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <div class="rounded-xl border border-slate-100 p-6">
+            <p class="text-3xl font-bold text-brand-navy">{{ teachers.count }}</p>
+            <p class="text-sm text-slate-500">Teachers</p>
+        </div>
+        <div class="rounded-xl border border-slate-100 p-6">
+            <p class="text-3xl font-bold text-brand-navy">{{ students.count }}</p>
+            <p class="text-sm text-slate-500">Students</p>
+        </div>
+        <div class="rounded-xl border border-slate-100 p-6">
+            <p class="text-3xl font-bold text-brand-navy">{{ study_guides.count }}</p>
+            <p class="text-sm text-slate-500">Study guides</p>
+        </div>
+    </div>
+
+    <h2 class="mt-10 text-lg font-semibold text-brand-navy">Teachers</h2>
+    {% if teachers %}
+        <div class="mt-4 overflow-x-auto rounded-lg border border-slate-100">
+            <table class="min-w-full divide-y divide-slate-100 text-sm">
+                <thead class="bg-slate-50">
+                    <tr>
+                        <th class="px-4 py-3 text-left font-semibold text-slate-600">Name</th>
+                        <th class="px-4 py-3 text-left font-semibold text-slate-600">Email</th>
+                        <th class="px-4 py-3 text-left font-semibold text-slate-600">Subject</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                    {% for teacher in teachers %}
+                        <tr>
+                            <td class="px-4 py-3 text-slate-700">{{ teacher.user.get_full_name|default:teacher.user.username }}</td>
+                            <td class="px-4 py-3 text-slate-500">{{ teacher.user.email }}</td>
+                            <td class="px-4 py-3 text-slate-500">{{ teacher.subject_specialty|default:"—" }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p class="mt-4 text-sm text-slate-500">No teachers yet. Add your first one above.</p>
+    {% endif %}
+
+    <h2 class="mt-10 text-lg font-semibold text-brand-navy">Students</h2>
+    {% if students %}
+        <div class="mt-4 overflow-x-auto rounded-lg border border-slate-100">
+            <table class="min-w-full divide-y divide-slate-100 text-sm">
+                <thead class="bg-slate-50">
+                    <tr>
+                        <th class="px-4 py-3 text-left font-semibold text-slate-600">Name</th>
+                        <th class="px-4 py-3 text-left font-semibold text-slate-600">Email</th>
+                        <th class="px-4 py-3 text-left font-semibold text-slate-600">Grade</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                    {% for student in students %}
+                        <tr>
+                            <td class="px-4 py-3 text-slate-700">{{ student.user.get_full_name|default:student.user.username }}</td>
+                            <td class="px-4 py-3 text-slate-500">{{ student.user.email }}</td>
+                            <td class="px-4 py-3 text-slate-500">{{ student.grade_level|default:"—" }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p class="mt-4 text-sm text-slate-500">No students have joined yet.</p>
+    {% endif %}
+</section>
+{% endblock %}

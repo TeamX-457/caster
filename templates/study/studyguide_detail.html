@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}{{ study_guide.title }} — CASTER{% endblock %}
+
+{% block content %}
+<section class="mx-auto max-w-3xl px-6 py-16">
+    <p class="text-sm font-semibold uppercase tracking-wide text-brand-gold">{{ study_guide.subject }} &middot; {{ study_guide.topic }}</p>
+    <h1 class="mt-1 text-3xl font-bold text-brand-navy">{{ study_guide.title }}</h1>
+
+    {% if request.user.is_student and progress %}
+        <div class="mt-4 flex items-center gap-3">
+            <span class="inline-flex rounded-full px-3 py-1 text-xs font-medium
+                {% if progress.status == 'completed' %}bg-green-100 text-green-800
+                {% elif progress.status == 'in_progress' %}bg-amber-100 text-amber-800
+                {% else %}bg-slate-100 text-slate-700{% endif %}">
+                {{ progress.get_status_display }}
+            </span>
+            {% if progress.status != 'completed' %}
+                <form method="post" action="{% url 'study:studyguide_complete' study_guide.pk %}">
+                    {% csrf_token %}
+                    <button type="submit" class="text-sm font-semibold text-brand-navy hover:underline">Mark as completed</button>
+                </form>
+            {% endif %}
+        </div>
+    {% endif %}
+
+    <div class="prose prose-slate mt-8 max-w-none whitespace-pre-line text-slate-700">{{ study_guide.content }}</div>
+
+    <h2 class="mt-10 text-lg font-semibold text-brand-navy">Activities</h2>
+    {% if study_guide.activities.all %}
+        <ul class="mt-4 space-y-3">
+            {% for activity in study_guide.activities.all %}
+                <li class="rounded-lg border border-slate-100 p-4">
+                    <p class="text-xs font-semibold uppercase tracking-wide text-brand-gold">{{ activity.get_activity_type_display }}</p>
+                    <p class="mt-1 font-semibold text-brand-navy">{{ activity.title }}</p>
+                    {% if activity.instructions %}<p class="mt-1 text-sm text-slate-600">{{ activity.instructions }}</p>{% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p class="mt-4 text-sm text-slate-500">No activities added yet.</p>
+    {% endif %}
+
+    <h2 class="mt-10 text-lg font-semibold text-brand-navy">Assessments</h2>
+    {% if study_guide.assessments.all %}
+        <ul class="mt-4 space-y-3">
+            {% for assessment in study_guide.assessments.all %}
+                <li class="flex items-center justify-between rounded-lg border border-slate-100 p-4">
+                    <div>
+                        <p class="font-semibold text-brand-navy">{{ assessment.title }}</p>
+                        <p class="text-sm text-slate-500">{{ assessment.questions.count }} question(s)</p>
+                    </div>
+                    <a href="{% url 'assessments:assessment_detail' assessment.pk %}" class="font-semibold text-brand-navy hover:underline">
+                        {% if request.user.is_student %}Take &rarr;{% else %}Manage &rarr;{% endif %}
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p class="mt-4 text-sm text-slate-500">No assessments yet.</p>
+    {% endif %}
+
+    {% if request.user.is_teacher and study_guide.created_by == request.user.teacher_profile %}
+        <div class="mt-10 flex flex-wrap gap-4 border-t border-slate-100 pt-6">
+            <a href="{% url 'study:activity_create' study_guide.pk %}" class="rounded-md border border-brand-navy px-4 py-2 text-sm font-semibold text-brand-navy hover:bg-brand-navy hover:text-white">
+                + Add activity
+            </a>
+            <a href="{% url 'assessments:assessment_create' study_guide.pk %}" class="rounded-md border border-brand-navy px-4 py-2 text-sm font-semibold text-brand-navy hover:bg-brand-navy hover:text-white">
+                + Add assessment
+            </a>
+            <a href="{% url 'study:studyguide_assign' study_guide.pk %}" class="rounded-md bg-brand-navy px-4 py-2 text-sm font-semibold text-white hover:bg-brand-navy-light">
+                Assign to students
+            </a>
+        </div>
+    {% endif %}
+</section>
+{% endblock %}

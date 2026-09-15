@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block title %}Add activity — CASTER{% endblock %}
+
+{% block content %}
+<section class="mx-auto max-w-2xl px-6 py-16">
+    <p class="text-sm font-semibold uppercase tracking-wide text-brand-gold">{{ study_guide.title }}</p>
+    <h1 class="mt-1 text-2xl font-bold text-brand-navy">Add a learning activity</h1>
+
+    <form method="post" class="mt-6">
+        {% csrf_token %}
+        {% include "includes/form_fields.html" %}
+        <button type="submit" class="rounded-md bg-brand-navy px-6 py-3 text-sm font-semibold text-white shadow-sm hover:bg-brand-navy-light">
+            Add activity
+        </button>
+    </form>
+</section>
+{% endblock %}
