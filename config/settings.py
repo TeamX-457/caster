@@ -18,6 +18,18 @@ environ.Env.read_env(BASE_DIR / '.env')
 SECRET_KEY = env('DJANGO_SECRET_KEY', default='django-insecure-change-me-in-production')
 DEBUG = env('DEBUG')
 ALLOWED_HOSTS = env.list('DJANGO_ALLOWED_HOSTS', default=['localhost', '127.0.0.1'])
+CSRF_TRUSTED_ORIGINS = env.list('CSRF_TRUSTED_ORIGINS', default=[])
+
+# Render sets this automatically for every web service (e.g. "caster-udly.onrender.com") —
+# trust it without requiring DJANGO_ALLOWED_HOSTS to be kept in sync by hand, and without
+# breaking if Render ever reassigns the subdomain.
+_render_host = env('RENDER_EXTERNAL_HOSTNAME', default=None)
+if _render_host:
+    if _render_host not in ALLOWED_HOSTS:
+        ALLOWED_HOSTS.append(_render_host)
+    _render_origin = f'https://{_render_host}'
+    if _render_origin not in CSRF_TRUSTED_ORIGINS:
+        CSRF_TRUSTED_ORIGINS.append(_render_origin)
 
 
 # Application definition
