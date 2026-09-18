@@ -78,6 +78,13 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # https://docs.djangoproject.com/en/6.1/ref/settings/#databases
 # Defaults to PostgreSQL. Override DATABASE_URL in .env (e.g. with a sqlite:///
 # URL) if you want to run the landing page without a local Postgres server.
+#
+# When DATABASE_URL points at Postgres, all of CASTER's tables (including
+# django_migrations, contenttypes, sessions, etc.) live in the `caster`
+# schema rather than `public`. This lets this project safely share one
+# physical Postgres database/instance with other, unrelated Django
+# projects (e.g. for a shared dev database) without their tables or
+# migration history colliding with ours.
 
 DATABASES = {
     'default': env.db(
@@ -85,6 +92,9 @@ DATABASES = {
         default='postgres://caster:caster@localhost:5432/caster',
     )
 }
+
+if DATABASES['default']['ENGINE'] == 'django.db.backends.postgresql':
+    DATABASES['default'].setdefault('OPTIONS', {})['options'] = '-c search_path=caster,public'
 
 
 AUTH_USER_MODEL = 'accounts.User'
